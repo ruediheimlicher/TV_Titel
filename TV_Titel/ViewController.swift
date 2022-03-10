@@ -110,35 +110,101 @@ class ViewController: NSViewController, FileManagerDelegate
             
             else if (namenarray.count > 3)
             {
-               print("namenarray datum \(namenarray[0]) title: \(namenarray[namenarray.count - 1])")
-               for z in 0..<namenarray.count
+               
+               // separated mit _
+               
+               print("\n***  namenarray:")
+               for z in 3..<namenarray.count
                {
                   print("\(z) zeile: \(namenarray[z])")
                }
-
+               
+               //print("namenarray datum \(namenarray[0]) ")
                let datumarray =  namenarray[0].components(separatedBy: "-")
-               for z in 0..<datumarray.count
-               {
-                  print("\(z) zeile: \(datumarray[z])")
-               }
+   //            for z in 0..<datumarray.count
+   //            {
+   //               print("\(z) zeile: \(datumarray[z])")
+   //            }
 
+               
                let jahrteil = datumarray[0].suffix(2) // Jahr 4-stellig
                let monatteil = datumarray[1]    // monat mm
                let tagteil = datumarray[2]      // tag dd
                let datumteil = "\(jahrteil)\(monatteil)\(tagteil)"
-               print("datumteil: \(datumteil)") // datum zahl
+               //print("datumzahl: \(datumteil)") // datum als zahl
+               
+               let tvsender = namenarray[3]
+               //print("sender: \(tvsender)")
+               
                
                // suffix weg: letztes Element
-               
-               let titelarray = namenarray[namenarray.count - 1].components(separatedBy: ".")
-              
-               print("titelarray(0): \(titelarray[0])")
+               let teile = namenarray.count
+               // https://stackoverflow.com/questions/24034398/new-array-from-index-range-swift
+               let titelslice = namenarray[4...(teile-1)]
+               let titelarray = Array(titelslice)
+               //let titelarray = namenarray[namenarray.count - 1].components(separatedBy: ".")
+              /*
+               print("titelarray:")
                for z in 0..<titelarray.count
                {
-                  print("\(z) zeile: \(titelarray[z])")
+                  print("\t\(z) zeile: \(titelarray[z])")
                }
+               */
               // print("titelarray: \(titelarray[0])")
-               var titelteil = "\(titelarray[0]).\(titelarray[titelarray.count - 1])" // erster und letzter teil
+               var titelzeile = tvsender + " "
+               var tvsuffix = ""
+               for z in 0..<titelarray.count
+               {
+                  var tempzeile = titelarray[z]
+                 
+                  let elementarray = tempzeile.components(separatedBy:".")
+                  tempzeile = elementarray[0]
+                  if elementarray.count > 1 // suffix suchen
+                  {
+                     tvsuffix = elementarray.last ?? ".mp4"
+                     print("z: /(z) suffix: \(tvsuffix)")
+                  }
+                  tempzeile = tempzeile.components(separatedBy:"-cut-")[0]
+                  //print("lastzeile B: \(lastzeile)")
+                  tempzeile = tempzeile.components(separatedBy:"-00")[0]
+                  //print("lastzeile C: \(lastzeile)")
+                  tempzeile = tempzeile.replacingOccurrences(of:"-",with:" ")
+                  //print("z: \(z) tempzeile: \(tempzeile)")
+                  if !titelzeile.contains(tempzeile)
+                  {
+                     if z == titelarray.count - 1
+                     {
+                        titelzeile = titelzeile + tempzeile
+                     }
+                     else
+                     {
+                        titelzeile = titelzeile + tempzeile + " "
+                     }
+                  }
+               }
+               titelzeile = titelzeile + "." + tvsuffix
+               print("titelzeile: \(titelzeile)")
+               var a = 0
+               /*
+               var firstzeile = titelarray.first
+               firstzeile = firstzeile?.replacingOccurrences(of:"-",with:" ")
+               print("firstzeile A: \(firstzeile)")
+               
+               var lastzeile = titelarray.last
+               lastzeile = lastzeile?.components(separatedBy:".")[0]
+               //print("lastzeile A: \(lastzeile)")
+               lastzeile = lastzeile?.components(separatedBy:"-cut-")[0]
+               //print("lastzeile B: \(lastzeile)")
+               lastzeile = lastzeile?.components(separatedBy:"-00")[0]
+               //print("lastzeile C: \(lastzeile)")
+               lastzeile = lastzeile?.replacingOccurrences(of:"-",with:" ")
+               print("lastzeile D: \(lastzeile)")
+               */
+               
+               var titelteil = "\(titelarray[0]).\(titelarray[titelarray.count - 1])" 
+               // erster und letzter teil
+               
+               
                titelteil = titelteil.replacingOccurrences(of:"-00",with:"")
                titelteil = titelteil.replacingOccurrences(of:"-",with:" ")
  //              var titelteilarray = titelteil.components(separatedBy: "-")
@@ -148,8 +214,11 @@ class ViewController: NSViewController, FileManagerDelegate
                
                
                //print("titelteil: \(titelteil)")
-               let neuername = "\(datumteil) \(titelteil)"
-               print("neuername: \(neuername)")
+               let neuername = "\(datumteil) \(titelzeile)"
+               print("neuername: \(neuername) pfad: \(pfad)")
+               
+
+             
                var newpfad = "\(pfad)/\(item)"
                //https://stackoverflow.com/questions/35158215/rename-file-in-documentdirectory
                let pfadURL = URL(fileURLWithPath: pfad,isDirectory: false)
@@ -174,7 +243,7 @@ class ViewController: NSViewController, FileManagerDelegate
                }
                 
             }
-         }
+         } // for item
       } catch {
         print("failed to read directory – bad permissions, perhaps?")
          spinner.stopAnimation(nil) 
@@ -204,6 +273,7 @@ class ViewController: NSViewController, FileManagerDelegate
       var lblFileName.text = pathPrefix  // Print name on Label
    */
    }
+   
    override var representedObject: Any? {
       didSet {
       // Update the view, if already loaded.
